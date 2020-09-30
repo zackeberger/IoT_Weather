@@ -4,10 +4,12 @@ see the basic functionality.
 
 Build with 'make', clean executables with 'make clean'. Automated test harness for local_prog run with 'make check'.
 
-local_prog.c compiles to a program, local_prog, that does not involve any network communication. It is easier to configure and use.
-tcp.c compiles to a program, tcp, that extends local_prog.c for network communication with a server sending requests.
-tls.c compiles to a program, tls, that extends tcp.c to to involve encrypted communication.
+Notes
+* local_prog.c compiles to a program, local_prog, that does not involve any network communication. It is easier to configure and use.
+* tcp.c compiles to a program, tcp, that extends local_prog.c for network communication with a server sending requests.
+* tls.c compiles to a program, tls, that extends tcp.c to to involve encrypted communication.
 
+* tls.c requires OpenSSL library as a dependency
 
 
 Included Files
