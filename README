@@ -1,0 +1,17 @@
+NAME:   Zachary Berger
+EMAIL:  zackeberger@gmail.com
+ID:     705082271
+
+
+Included Files
+- README
+- Makefile
+- lab4c_tcp.c     source file for TCP server communication
+- lab4c_tls.c     source file for TLS server communication
+- compile.sh      script to compile on beaglebone or lnxsrv
+
+
+Sources Referenced
+- Discussion 1A Slides
+- https://stackoverflow.com/questions/46636641/how-does-optind-get-assigned-in-c
+- https://www.openssl.org/docs/manmaster/man7/ssl.html

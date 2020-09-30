@@ -1,0 +1,25 @@
+NAME:   Zachary Berger
+EMAIL:  zackeberger@gmail.com
+ID:     705082271
+
+Included Files
+- README
+- Makefile
+
+- lab4b.c		source file for embedded application that builds and runs (with no errors or warnings) on an embedded system
+- smoke_test.sh		automated test harness
+- compile.sh		script to compile on beaglebone or lnxsrv
+
+
+Sources Referenced
+- Discussion 1A Slides
+- https://www.quora.com/What-is-the-best-way-to-clear-an-array-using-C-language
+- https://stackoverflow.com/questions/4647665/why-cast-an-unused-function-parameter-value-to-void
+- https://stackoverflow.com/questions/4214314/get-a-substring-of-a-char
+
+Testing Methodology
+- Automated test harness included in smoke_test.sh. Run via "make check"
+- Test 1: check to see if program handles bad --scale argument
+- Test 2: check to see if program handles user commands
+	  check to see if program creates logfile
+	  check to see if program logs commands 
