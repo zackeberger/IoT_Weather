@@ -1,14 +1,10 @@
 #!/bin/bash
 
-# NAME:   Zachary Berger
-# EMAIL:  zackeberger@gmail.com
-# ID:     705082271 
-
 echo "Running smoke test"
 echo
 
 echo "Test 1: program checks bad --scale argument"
-./lab4b --scale=G 2> /dev/null
+./local_prog --scale=G 2> /dev/null
 if [ $? -ne 1 ]
 then
 	echo "FAILED Test #1"
@@ -18,7 +14,7 @@ fi
 echo
 
 echo "Test 2: process standard arguments"
-./lab4b --period=5 --scale=C --log=logger.txt <<-EOF
+./local_prog --period=5 --scale=C --log=logger.txt <<-EOF
 SCALE=F
 PERIOD=2
 SCALE=C
