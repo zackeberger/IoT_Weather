@@ -1,0 +1,289 @@
+<HTML>
+<HEAD>
+<TITLE>IoT Weather Reporter</TITLE>
+</HEAD>
+<BODY>
+<CENTER>
+<H1>IoT Weather Reporter</H1>
+</CENTER>
+
+<H2>PROJECT DESCRIPTION:</H2>
+<P>
+Write a program (called <tt>local_prog</tt>) that:
+<ul>
+   <li> builds and runs on your embedded system.</li>
+   <li> uses the AIO functions of the MRAA library to get readings from your temperature sensor.</li>
+   <li>	samples a temperature sensor at a configurable rate (defaulting to 1/second, and controlled
+   	by an optional <tt>--period=</tt># command line parameter that specifies a sampling 
+	interval in seconds).</li>
+   <li> converts the sensor value into a temperature.  By default, temperatures should be
+        reported in degrees Fahrenheit, but this can be controlled with an optional
+	<tt>--scale=C</tt> (or <tt>--scale=F</tt>) command line parameter.</li>
+   <li> creates a report for each sample that includes:
+   	<ul>
+	   <li>	time of the sample (e.g. <tt>17:25:58</tt>) in the local timezone</li>
+	   <li> a single blank/space</li>
+	   <li> a decimal temperature in degrees and tenths (e.g. <tt>98.6</tt>)
+	   <li> a newline character (<em>\n</em>)
+	</ul></li>
+   <li> writes that report to the stdout (fd 1).</li>
+   <li> appends that report to a logfile (which it creates on your embedded system) if that logging has been enabled
+   	with an optional <tt>--log=</tt><em>filename</em> parameter.</li>
+   <li> uses the GPIO functions of the MRAA library to samples the state of the button 
+   	(from your Grove sensor kit) and when it is pushed ...
+   	<ul>
+	   <li> outputs (and logs) a final sample with the time and the string <tt>SHUTDOWN</tt> 
+	   	(instead of a temperature).</li>
+	   <li> exits</li>
+	</ul>
+   </li>
+   <li> Your program can assume that the sensors are connected as recommended by the Grove
+        documentation.
+   </li>
+</ul>
+</p>
+<P>
+Note that we want you to use MRAA AIO/GPIO functions to access your sensors, and not the (more powerful
+and convenient) Grove library functions.  The Grove library hides all of the details of embedded I/O, 
+sampling and signal interpretation, but only works for the Grove Sensors.  
+We want you to get experience with direct control of and access to the digital and analog I/O pins.
+</P>
+<P>
+Many people have observed that the recommended calibration constants appear to be off by
+ten degrees or more.  Every sensor (including the ones that will be used when we grade your submissions)
+seems to read differently.
+</p>
+<P>
+The time returned from <em>localtime(3)</em> will only be in the correct timezone if you have
+correctly configured the local timezone on your embedded system.
+</P>
+Extend your program to (in parallel with generating reports) accept the following commands from stdin:
+<ul>
+   <li> <tt><strong>SCALE=F</strong></tt><br>
+   	This command should cause all subsequent reports to be generated in degrees Fahrenheit.
+   </li>
+   <li> <tt><strong>SCALE=C</strong></tt><br>
+   	This command should cause all subsequent reports to be generated in degrees Centegrade
+   </li>
+   <li> <tt><strong>PERIOD=</strong></tt><em>seconds</em><br>
+   	This command should change the number of seconds between reporting intervals.
+	It is acceptable if this command does not take effect until after the next
+	report.
+   </li>
+   <li> <tt><strong>STOP</strong></tt><br>
+   	This command should cause the program to stop generating reports, but continue
+	processing input commands.
+	If the program is not generating reports, merely log receipt of the command.
+   </li>
+   <li> <tt><strong>START</strong></tt><br>
+   	This command should cause the program to, if stopped, resume generating reports.
+	If the program is not stopped, merely log receipt of the command.
+   </li>
+   <li> <strong><tt>LOG</tt></strong> <em>line of text</em><br>
+     	This command requires no action beyond logging its receipt
+	(the entire command, including the <tt>LOG</tt>).
+        In project 4C, the server may send such commands to help 
+	you debug problems with your reports.
+   </li>
+   <li> <tt><strong>OFF</strong></tt><br>
+   	This command should, like pressing the button, output (and log) a time-stamped <tt>SHUTDOWN</tt> message 
+	and exit.
+   </li>
+</ul>
+<P>
+All received commands will be terminated by a new-line character ('<em>\n</em>').
+Note that when your program is tested (by the sanity checker or grading program)
+stdin will not be a console, but a pipe.  
+A single read may return a partial line or multiple lines.
+Make sure that your program buffers and lexes its input,
+and does not assume that one call to <em>read(2)</em> will return one command.
+</P>
+<P>
+Nothing special needs to be done about strange combinations of commands:
+<UL>
+   <li> a <tt>START</tt> when you are already started is a no-op.</li>
+   <li> a <tt>STOP</tt> when you are already stopped is a no-op.</li>
+   <li> it is not expected that a <tt>STOP</tt>, <tt>PERIOD</tt>,
+   	or <tt>SCALE</tt> command
+        will force out a report whose time as not yet come.</li>
+</UL>
+</P>
+<P>
+If logging is enabled, all received commands (valid or not)
+should be appended to the log file (exactly as
+received, with no timestamp) but not displayed to standard output.  A sample log is 
+shown below:
+</p>
+<pre><tt>
+	11:37:41 98.6
+	11:37:42 98.6
+	11:37:43 98.6
+	PERIOD=5
+	11:37:44 98.6
+	11:37:49 98.6
+	11:37:54 98.6
+	SCALE=C
+	11:37:59 37.0
+	11:38:04 37.0
+	STOP
+	START
+	11:38:19 37.0
+	11:38:24 37.0
+	OFF
+	11:38:27 SHUTDOWN
+</tt></pre>
+<P>
+If you are typing commands to your program, you may see the echos interspersed with 
+temperature reports.  This is unimportant, because they should be correctly distinct
+in your log, and when we test your submission, the input will becoming from a program
+rather than a console.
+</P>
+<P>
+The sanity check script will send a series of commands to your program, and some
+implementations process all the commands before generating any reports.  To make
+sure this doesn't happen, you should generate your first report before you start
+processing input commands.  Again, this will not be an issue during testing because
+there will be delays between the commands when we test your program.
+</P>
+<P>
+You could implement this program with separate threads for sensor polling and command processing,
+but the computation associated with each operation is so small that you may find it much simpler
+to use a single thread (and polling or non-blocking I/O) to avoid hanging on standard input for
+commands that only rarely arrive.  A poll system call cannot tell you that the button has
+been pushed, but GPIO pin read is a non-blocking operation, so you can simply read the button
+status periodically.  If your interval between reads is too long, the button may be pressed
+and released before you can read its status.  To avoid this problem, you can either use
+a short polling interval or arrange for an interrupt/signal when the button is pushed.
+</P>
+<P>
+To facilitate development and testing you might find it helpful to write your program to support a 
+(<tt>-DDUMMY</tt>) define whose special code includes mock implementations for the <tt>mraa_aio_</tt> and 
+<tt>mraa_gpio_</tt> functionality. Doing so will enable you to do most of your testing on your regular computer.  
+When you are satisfied that it works there, modify your Makefile, run the command "<tt>uname -r</tt>", and check for the 
+presence of the string "<tt>beaglebone</tt>" in the resulting output. If it is not found, build with a rule
+that passed the <tt>-DDUMMY</tt> flag to <em>gcc</em>.
+</p>
+
+<H2>Project Extension (Networking):</H2>
+<H3>Part 1: Communication with a Logging Server</H3>
+<P>
+Write a program (called <tt>tcp</tt>) that:
+<ul>
+   <li> builds and runs on your Beaglebone.</li>
+   <li> is based on the temperature sensor application you built previously
+        (including the <tt>--period=</tt>, <tt>--scale=</tt> and <tt>--log=</tt> options).
+   </li>
+   <li> accepts the following (mandatory) new parameters:
+       <ul>
+        <li><tt>--id=</tt><em>9-digit-number</em></li>
+        <li><tt>--host=</tt><em>name or address</em></li>
+        <li><tt>--log=</tt><em>filename</em></li>
+        <li><em>port number</em></li>
+    </ul>
+       Note that there is no <tt>--port=</tt> in front of the port number.
+          This is a non-switch parameter.
+   </li>
+   <li> accepts the same commands and generates the same reports as the
+       previous Beaglebone project, but now the input and output are from/to
+    a network connection to a server.
+       <ol type="1">
+        <li> open a TCP connection to the server at the specified address and port</li>
+        <li> immediately send (and log) an ID terminated with a newline:<br>
+            <strong><tt>ID=</tt></strong><em>ID-number</em>  <br>
+            This new report
+            enables the server to keep track of which devices it has received
+            reports from.
+        </li>
+        <li> as before, send (and log) newline terminated temperature reports over the connection </li>
+        <li> as before, process (and log) newline-terminated commands received over the connection<br>
+            If your temperature reports are mis-formatted, the server will return
+            a <strong><tt>LOG</tt></strong> command with a description of the
+            error.<br>
+            Having logged these commands will help you
+            find and fix any problems with your reports.
+        </li>
+        <li> as before, the last command sent by the server will be an <strong><tt>OFF</tt></strong>.<br>
+             Unlike the previous project, the button will not be used as an
+             alternative manual shutdown mechanism.
+        </li>
+    </ol>
+       <P>
+       Do not accept commands from standard input, or send received commands or generated
+       reports to standard output.
+    </p>
+   </li>
+   <li> As before, assume that the temperature sensor has been connected
+         to Analog input 0.</li>
+</ul>
+The ID number (passed with the initial <strong>ID=</strong> command) will appear in the TCP server log
+(follow the
+<a href="serverinfo.html">TCP server URL</a>),
+and will permit you to find the reports and server-side logs for your sessions.
+It is vitally important that the <strong>ID=</strong> string you send to the server (in your first report)
+be identical to the value (passed to your client) in the <tt>--id=</tt> command line argument.
+If they are not identical, the sanity-check and grading scripts will be unable to find
+the reports from your session(s) and will assume that your program did not work.
+</P>
+<P>
+If the server receives incorrect reports from you it will send back LOG
+messages describing the errors.
+</P>
+<p>
+To protect your privacy, you do not have to use your student ID number, but merely
+a nine-digit number that you will recognize and that will be different from the
+numbers chosen by others.
+</p>
+<P>
+From the server status page, you will also be able to see, for each client,
+a log of all commands sent to and reports received from that client in the
+most recent session.  If the server does not like your reports, it may be due
+to garbage (typically null) characters.  If the problem with your reports is
+not obvious, examine the server log in an editor that will display non-graphical
+characters.
+</p>
+<P>
+As in Project 4B, to facilitate development and testing you might find it helpful to write your program to, if compiled with a special
+(<tt>-DDUMMY</tt>) define, include mock implementations for the <tt>mraa_aio_</tt> and
+<tt>mraa_gpio_</tt> functionality. Doing so will enable you to do most of your testing on your regular computer.
+When you are satisfied that it works there, modify your Makefile run the command "<tt>uname -r</tt>", check for the
+presence of the string "<tt>beaglebone</tt>" in that output, and if not found, build with a rule
+that passed the <tt>-DDUMMY</tt> flag to <em>gcc</em>.
+</p>
+
+
+<H3>Part 2: Authenticated TLS Session Encryption</H3>
+<P>
+Write a program (called <tt>tls</tt>) that:
+<ul>
+   <li> builds and runs on your Beaglebone</li>
+   <li> is based on the remote logging appliance build in part 1</li>
+ <!--
+   <li> accepts the following additional command line parameter:
+       <ul>
+    <li><tt>--serverkey=</tt><em>key file</em> for server's public key</li>
+    </ul>
+   </li>
+ -->
+   <li> operates by:
+       <ol type="1">
+        <li> opening a TLS connection to the server at the specified address and port
+             <!-- and authenticating the server against a supplied
+                 <a href="lab4c_server.crt">certificate</a>.
+             If the server
+             does not use the expected certificate, log an error (to both
+             standard error and to the log), close the connection, and exit.-->
+        </li>
+        <li> sending (and logging) your student ID followed by a newline </li>
+        <li> sending (and logging) temperature reports over the connection </li>
+        <li> processing (and logging) commands received over the connection </li>
+    </ol>
+   </li>
+</ul>
+The ID number will appear in the TLS server log
+(follow the
+<a href="serverinfo.html">TLS server URL</a>),
+and will permit you to find the reports for your sessions.
+</p>
+
+
+<!-- Sourced from UCLA CS111 Project 4 ->

@@ -1,17 +1,23 @@
-NAME:   Zachary Berger
-EMAIL:  zackeberger@gmail.com
-ID:     705082271
+Source files for programs meant to be run on Beaglebone. Configured with a temperature sensor and button, the beaglebone,
+the device will be able to read temperatures and be turned on/off. A beaglebone is not required to run the programs and
+see the basic functionality.
+
+Build with 'make', clean executables with 'make clean'. Automated test harness for local_prog run with 'make check'.
+
+local_prog.c compiles to a program, local_prog, that does not involve any network communication. It is easier to configure and use.
+tcp.c compiles to a program, tcp, that extends local_prog.c for network communication with a server sending requests.
+tls.c compiles to a program, tls, that extends tcp.c to to involve encrypted communication.
+
 
 
 Included Files
 - README
 - Makefile
-- lab4c_tcp.c     source file for TCP server communication
-- lab4c_tls.c     source file for TLS server communication
-- compile.sh      script to compile on beaglebone or lnxsrv
-
-
-Sources Referenced
-- Discussion 1A Slides
-- https://stackoverflow.com/questions/46636641/how-does-optind-get-assigned-in-c
-- https://www.openssl.org/docs/manmaster/man7/ssl.html
+- spec.html		html page for the spec used to designed this project (sourced from UCLA)
+- src
+  - local_prog.c	source file for embedded system driver
+  - tls.c     		source file for TLS server communication
+  - tcp.c     		source file for TCP server communication
+- scripts
+  - compile.sh      	script to compile on beaglebone or lnxsrv
+  - local_test.sh	script with automated test harness	
